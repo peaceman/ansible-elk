@@ -1,0 +1,55 @@
+---
+- name: Create logstash config and docker context folders
+  file:
+    state: directory
+    path: "{{ elk_docker_compose_project_dir }}/{{ item }}"
+    mode: 0755
+  loop:
+    - "logstash/config"
+    - "logstash/pipeline"
+
+- name: Copy logstash certificate files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ elk_docker_compose_project_dir }}/logstash/config/{{ item.dest }}"
+    mode: 0644
+  loop:
+    - { src: "{{ elk_ca_file_internal }}", dest: "ca.crt" }
+    - { src: "{{ elk_logstash_cert_file_internal }}", dest: "logstash.crt" }
+    - { src: "{{ elk_logstash_cert_key_file_internal }}", dest: "logstash.key" }
+  notify:
+    - restart elk
+
+- name: Create logstash dockerfile
+  template:
+    src: logstash_dockerfile.j2
+    dest: "{{ elk_docker_compose_project_dir }}/logstash/Dockerfile"
+  notify:
+    - restart elk
+
+- name: Create logstash config yml
+  template:
+    src: logstash_config.yml.j2
+    dest: "{{ elk_docker_compose_project_dir }}/logstash/config/logstash.yml"
+    mode: 0644
+  notify:
+    - restart elk
+
+- name: Create logstash pipeline config
+  template:
+    src: logstash_pipeline.conf.j2
+    dest: "{{ elk_docker_compose_project_dir }}/logstash/pipeline/logstash.conf"
+    mode: 0644
+  notify:
+    - restart elk
+
+- name: Create pipeline configurations
+  template:
+    src: "{{ tpl.src }}"
+    dest: "{{ elk_docker_compose_project_dir }}/logstash/pipeline/{{ tpl.name }}.conf"
+    mode: 0644
+  loop: "{{ elk_logstash_pipeline_templates }}"
+  loop_control:
+    loop_var: tpl
+  notify:
+    - restart elk

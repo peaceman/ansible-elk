@@ -1,0 +1,9 @@
+journalbeat.inputs:
+  - paths: []
+    seek: cursor
+
+output.logstash:
+  hosts: ["{{ elk_logstash_host | mandatory }}:{{ elk_logstash_port }}"]
+  ssl.certificate_authorities: ["{{ elk_journalbeat_config_dir }}/ca.pem"]
+  ssl.certificate: "{{ elk_journalbeat_config_dir }}/cert.pem"
+  ssl.key: "{{ elk_journalbeat_config_dir }}/cert.key"

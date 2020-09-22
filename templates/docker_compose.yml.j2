@@ -1,0 +1,86 @@
+version: '3.2'
+
+services:
+  elasticsearch:
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: "{{ elk_version }}"
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "{{ elk_elastic_java_opts }}"
+      ELASTIC_PASSWORD: "{{ elk_elastic_password | mandatory }}"
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks
+      # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    networks:
+      - elk
+
+  logstash:
+    build:
+      context: logstash/
+      args:
+        ELK_VERSION: "{{ elk_version }}"
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - type: bind
+        source: ./logstash/config/ca.crt
+        target: /usr/share/logstash/config/ca.crt
+        read_only: true
+      - type: bind
+        source: ./logstash/config/logstash.crt
+        target: /usr/share/logstash/config/logstash.crt
+        read_only: true
+      - type: bind
+        source: ./logstash/config/logstash.key
+        target: /usr/share/logstash/config/logstash.key
+        read_only: true
+{% if elk_logstash_volumes | length %}
+      {{ elk_logstash_volumes | to_nice_yaml(indent=6) }}
+{% endif %}
+    environment:
+      LS_JAVA_OPTS: "{{ elk_logstash_java_opts }}"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+    ports:
+      {{ elk_logstash_ports | to_nice_yaml(indent=6) }}
+
+  kibana:
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: "{{ elk_version }}"
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+    ports:
+      {{ elk_kibana_ports | to_nice_yaml(indent=6) }}
+
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+  elasticsearch:

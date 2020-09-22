@@ -1,0 +1,18 @@
+output {
+	elasticsearch {
+		hosts => "elasticsearch:9200"
+		user => "{{ elk_logstash_pipeline_elastic_username }}"
+		password => "{{ elk_logstash_pipeline_elastic_password | default('') }}"
+	}
+}
+
+input {
+    beats {
+        port => 5044
+        ssl => true
+        ssl_certificate => "/usr/share/logstash/config/logstash.crt"
+        ssl_key => "/usr/share/logstash/config/logstash.key"
+        ssl_verify_mode => "force_peer"
+        ssl_certificate_authorities => ["/usr/share/logstash/config/ca.crt"]
+    }
+}

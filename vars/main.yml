@@ -1,0 +1,16 @@
+---
+# vars file for peaceman.elk
+elk_local_data_dir: "{{ local_data_dir }}/elk"
+elk_elastic_passwords_dir: "{{ elk_local_data_dir }}/passwords"
+
+elk_ca_dir: "{{ elk_local_data_dir }}/{{ elk_ca_dirname }}"
+elk_certs_dir: "{{ elk_local_data_dir }}/{{ elk_certs_dirname }}"
+
+elk_ca_file_default: "{{ elk_ca_dir }}/ca.pem"
+elk_ca_file_internal: "{{ elk_ca_file | default(elk_ca_file_default, true) }}"
+
+elk_logstash_cert_file_default: "{{ elk_certs_dir }}/{{ elk_logstash_host }}.pem"
+elk_logstash_cert_file_internal: "{{ elk_logstash_cert_file | default(elk_logstash_cert_file_default, true) }}"
+
+elk_logstash_cert_key_file_default: "{{ elk_certs_dir }}/{{ elk_logstash_host }}-key.p8"
+elk_logstash_cert_key_file_internal: "{{ elk_logstash_cert_key_file | default(elk_logstash_cert_key_file_default, true) }}"

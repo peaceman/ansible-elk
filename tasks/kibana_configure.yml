@@ -1,0 +1,23 @@
+---
+- name: Create kibana config and docker context folders
+  file:
+    state: directory
+    path: "{{ elk_docker_compose_project_dir }}/{{ item }}"
+    mode: 0755
+  loop:
+    - "kibana/config"
+
+- name: Create kibana dockerfile
+  template:
+    src: kibana_dockerfile.j2
+    dest: "{{ elk_docker_compose_project_dir }}/kibana/Dockerfile"
+  notify:
+    - restart elk
+
+- name: Create kibana config yml
+  template:
+    src: kibana_config.yml.j2
+    dest: "{{ elk_docker_compose_project_dir }}/kibana/config/kibana.yml"
+    mode: 0644
+  notify:
+    - restart elk

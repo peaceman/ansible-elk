@@ -1,0 +1,13 @@
+---
+# handlers file for peaceman.elk
+- name: restart elk
+  docker_compose:
+    project_src: "{{ elk_docker_compose_project_dir }}"
+    remove_orphans: true
+    state: present
+    restarted: true
+
+- name: restart journalbeat
+  systemd:
+    name: journalbeat
+    state: restarted

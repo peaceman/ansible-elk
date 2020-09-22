@@ -1,0 +1,20 @@
+---
+- name: Create elasticsearch config and docker context folder
+  file:
+    state: directory
+    path: "{{ elk_docker_compose_project_dir }}/elasticsearch/config"
+
+- name: Create elasticsearch dockerfile
+  template:
+    src: elastic_dockerfile.j2
+    dest: "{{ elk_docker_compose_project_dir }}/elasticsearch/Dockerfile"
+  notify:
+    - restart elk
+
+- name: Create elasticsearch config yml
+  template:
+    src: elastic_config.yml.j2
+    dest: "{{ elk_docker_compose_project_dir }}/elasticsearch/config/elasticsearch.yml"
+    mode: 0644
+  notify:
+    - restart elk

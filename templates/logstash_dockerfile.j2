@@ -1,0 +1,11 @@
+ARG ELK_VERSION
+
+# https://www.docker.elastic.co/
+FROM docker.elastic.co/logstash/logstash:${ELK_VERSION}
+
+# Add your logstash plugins setup here
+# Example: RUN logstash-plugin install logstash-filter-json
+
+{% for plugin in elk_logstash_plugins %}
+RUN logstash-plugin install {{ plugin }}
+{% endfor %}

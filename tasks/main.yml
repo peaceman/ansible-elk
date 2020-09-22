@@ -1,0 +1,48 @@
+---
+# tasks file for peaceman.elk
+- name: Ensure docker compose project folder for elk exists
+  file:
+    state: directory
+    path: "{{ elk_docker_compose_project_dir }}"
+    mode: 0750
+
+- name: Initial configuration of elastic, logstash and kibana
+  block:
+    - name: Configure elastic
+      include_tasks: elastic_configure.yml
+
+    - name: Configure logstash
+      include_tasks: logstash_configure.yml
+
+    - name: Configure kibana
+      include_tasks: kibana_configure.yml
+  when: not lookup('file', elk_elastic_passwords_dir ~ '/elastic.txt', errors='ignore')
+
+- name: Create docker-compose file
+  template:
+    src: docker_compose.yml.j2
+    dest: "{{ elk_docker_compose_project_dir }}/docker-compose.yml"
+
+- name: Start elk
+  docker_compose:
+    project_src: "{{ elk_docker_compose_project_dir }}"
+    remove_orphans: true
+    state: present
+
+- name: Bootstrap and extract elastic passwords
+  include_tasks: elastic_extract_passwords.yml
+  when: not lookup('file', elk_elastic_passwords_dir ~ '/elastic.txt', errors='ignore')
+
+- name: Configure elastic
+  include_tasks: elastic_configure.yml
+
+- name: Configure logstash
+  include_tasks: logstash_configure.yml
+  vars:
+    elk_logstash_system_elastic_password: "{{ lookup('file', elk_elastic_passwords_dir ~ '/' ~ elk_logstash_system_elastic_username ~ '.txt') }}"
+    elk_logstash_pipeline_elastic_password: "{{ lookup('file', elk_elastic_passwords_dir ~ '/' ~ elk_logstash_pipeline_elastic_username ~ '.txt') }}"
+
+- name: Configure kibana
+  include_tasks: kibana_configure.yml
+  vars:
+    elk_kibana_elastic_password: "{{ lookup('file', elk_elastic_passwords_dir ~ '/' ~ elk_kibana_elastic_username ~ '.txt') }}"

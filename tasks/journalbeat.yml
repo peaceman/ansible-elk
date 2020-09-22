@@ -1,0 +1,43 @@
+---
+- include_tasks: apt_repo.yml
+- name: Install journalbeat
+  apt:
+    name: journalbeat
+    state: present
+
+- name: Start journalbeat automatically during boot
+  systemd:
+    name: journalbeat
+    state: started
+    enabled: true
+
+- name: Copy ca certificate
+  copy:
+    src: "{{ elk_ca_file_internal }}"
+    dest: "{{ elk_journalbeat_config_dir }}/ca.pem"
+    mode: 0600
+  notify:
+    - restart journalbeat
+
+- name: Copy client certificate
+  copy:
+    src: "{{ elk_certs_dir }}/beat.pem"
+    dest: "{{ elk_journalbeat_config_dir }}/cert.pem"
+    mode: 0600
+  notify:
+    - restart journalbeat
+
+- name: Copy client certificate key
+  copy:
+    src: "{{ elk_certs_dir }}/beat-key.p8"
+    dest: "{{ elk_journalbeat_config_dir }}/cert.key"
+    mode: 0600
+  notify:
+    - restart journalbeat
+
+- name: Configure journalbeat
+  template:
+    src: journalbeat.yml.j2
+    dest: "{{ elk_journalbeat_config_dir }}/journalbeat.yml"
+  notify:
+    - restart journalbeat
