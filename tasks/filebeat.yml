@@ -30,7 +30,7 @@
 
 - name: Copy client certificate
   copy:
-    src: "{{ elk_certs_dir }}/beat.pem"
+    src: "{{ elk_beat_cert_file_internal }}"
     dest: "{{ elk_filebeat_config_dir }}/cert.pem"
     mode: 0600
   notify:
@@ -38,7 +38,7 @@
 
 - name: Copy client certificate key
   copy:
-    src: "{{ elk_certs_dir }}/beat-key.p8"
+    src: "{{ elk_beat_cert_key_file_internal }}"
     dest: "{{ elk_filebeat_config_dir }}/cert.key"
     mode: 0600
   notify:
