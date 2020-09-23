@@ -1,0 +1,7 @@
+---
+- name: Add nginx module
+  template:
+    src: filebeat_nginx_module.yml.j2
+    dest: "{{ elk_filebeat_config_dir }}/modules.d/nginx.yml"
+  notify:
+    - restart filebeat

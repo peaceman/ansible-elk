@@ -1,0 +1,61 @@
+---
+- include_tasks: apt_repo.yml
+- name: Install filebeat
+  apt:
+    name: filebeat
+    state: present
+
+- name: Start filebeat automatically during boot
+  systemd:
+    name: filebeat
+    state: started
+    enabled: true
+
+- name: Ensure filebeat config include folders exist
+  file:
+    state: directory
+    path: "{{ elk_filebeat_config_dir }}/{{ item }}"
+    mode: 0755
+  loop:
+    - inputs.d
+    - modules.d
+
+- name: Copy ca certificate
+  copy:
+    src: "{{ elk_ca_file_internal }}"
+    dest: "{{ elk_filebeat_config_dir }}/ca.pem"
+    mode: 0600
+  notify:
+    - restart filebeat
+
+- name: Copy client certificate
+  copy:
+    src: "{{ elk_certs_dir }}/beat.pem"
+    dest: "{{ elk_filebeat_config_dir }}/cert.pem"
+    mode: 0600
+  notify:
+    - restart filebeat
+
+- name: Copy client certificate key
+  copy:
+    src: "{{ elk_certs_dir }}/beat-key.p8"
+    dest: "{{ elk_filebeat_config_dir }}/cert.key"
+    mode: 0600
+  notify:
+    - restart filebeat
+
+- name: Configure filebeat
+  template:
+    src: filebeat.yml.j2
+    dest: "{{ elk_filebeat_config_dir }}/filebeat.yml"
+  notify:
+    - restart filebeat
+
+- name: Check if /var/lib/docker exists
+  stat:
+    path: /var/lib/docker
+  register: docker_folder
+
+- name: Configure docker input
+  include_tasks: filebeat_docker.yml
+  when: elk_filebeat_docker_enable and docker_folder.stat.exists

@@ -1,0 +1,15 @@
+- module: nginx
+  access:
+    enabled: true
+    var.paths:
+      - /var/log/nginx/access.log
+{% if elk_filebeat_nginx_access_logs | length %}
+      {{ elk_filebeat_nginx_access_logs | to_nice_yaml(indent=6) }}
+{% endif %}
+  error:
+    enabled: true
+    var.paths:
+      - /var/log/nginx/error.log
+{% if elk_filebeat_nginx_error_logs | length %}
+      {{ elk_filebeat_nginx_error_logs | to_nice_yaml(indent=6) }}
+{% endif %}

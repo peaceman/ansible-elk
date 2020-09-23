@@ -1,0 +1,7 @@
+---
+- name: Add docker input
+  template:
+    src: filebeat_docker_input.yml.j2
+    dest: "{{ elk_filebeat_config_dir }}/inputs.d/docker.yml"
+  notify:
+    - restart filebeat

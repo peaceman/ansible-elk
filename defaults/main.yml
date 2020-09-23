@@ -5,7 +5,7 @@ local_data_dir: data
 
 elk_docker_compose_project_dir: /opt/docker/elk
 elk_version: "7.9.1"
-elk_elastic_java_opts: -Xmx256m -Xms256m
+elk_elastic_java_opts: -Xmx1g -Xms1g
 elk_elastic_password: changeme
 elk_elastic_plugins: []
 elk_elastic_config_lines: []
@@ -31,3 +31,7 @@ elk_ca_dirname: ca
 elk_certs_dirname: certs
 
 elk_journalbeat_config_dir: /etc/journalbeat
+elk_filebeat_config_dir: /etc/filebeat
+elk_filebeat_docker_enable: true
+elk_filebeat_nginx_access_logs: []
+elk_filebeat_nginx_error_logs: []

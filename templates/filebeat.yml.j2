@@ -1,0 +1,16 @@
+output.logstash:
+  hosts: ["{{ elk_logstash_host | mandatory }}:{{ elk_logstash_port }}"]
+  ssl.certificate_authorities: ["{{ elk_filebeat_config_dir }}/ca.pem"]
+  ssl.certificate: "{{ elk_filebeat_config_dir }}/cert.pem"
+  ssl.key: "{{ elk_filebeat_config_dir }}/cert.key"
+
+filebeat.config.inputs:
+  enabled: true
+  path: inputs.d/*.yml
+
+filebeat.config.modules:
+  enabled: true
+  path: modules.d/*.yml
+
+processors:
+  - add_docker_metadata:
