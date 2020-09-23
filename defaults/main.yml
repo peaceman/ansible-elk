@@ -14,16 +14,16 @@ elk_logstash_port: 5044
 elk_logstash_java_opts: -Xmx256m -Xms256m
 elk_logstash_plugins: []
 elk_logstash_system_elastic_username: logstash_system
-# elk_logstash_system_elastic_password:
 elk_logstash_pipeline_elastic_username: elastic
-# elk_logstash_pipeline_elastic_password:
 elk_logstash_config_lines: []
 elk_logstash_pipeline_templates: []
 elk_logstash_volumes: []
 
+# required to generate the logstash server certificate
+elk_logstash_host: # mandatory
+
 elk_kibana_plugins: []
 elk_kibana_elastic_username: kibana_system
-# elk_kibana_elastic_password:
 elk_kibana_config_lines: []
 elk_kibana_ports: []
 
