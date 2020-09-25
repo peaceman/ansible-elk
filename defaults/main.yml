@@ -27,9 +27,6 @@ elk_kibana_elastic_username: kibana_system
 elk_kibana_config_lines: []
 elk_kibana_ports: []
 
-elk_ca_dirname: ca
-elk_certs_dirname: certs
-
 elk_journalbeat_config_dir: /etc/journalbeat
 elk_filebeat_config_dir: /etc/filebeat
 elk_filebeat_docker_enable: true

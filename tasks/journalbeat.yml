@@ -21,7 +21,7 @@
 
 - name: Copy client certificate
   copy:
-    src: "{{ elk_beat_cert_file_internal }}"
+    src: "{{ elk_beat_cert_file | mandatory }}"
     dest: "{{ elk_journalbeat_config_dir }}/cert.pem"
     mode: 0600
   notify:
@@ -29,7 +29,7 @@
 
 - name: Copy client certificate key
   copy:
-    src: "{{ elk_beat_cert_key_file_internal }}"
+    src: "{{ elk_beat_cert_key_file | mandatory }}"
     dest: "{{ elk_journalbeat_config_dir }}/cert.key"
     mode: 0600
   notify:

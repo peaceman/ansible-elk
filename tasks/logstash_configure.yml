@@ -15,8 +15,8 @@
     mode: 0644
   loop:
     - { src: "{{ elk_ca_file_internal }}", dest: "ca.crt" }
-    - { src: "{{ elk_logstash_cert_file_internal }}", dest: "logstash.crt" }
-    - { src: "{{ elk_logstash_cert_key_file_internal }}", dest: "logstash.key" }
+    - { src: "{{ elk_logstash_cert_file | mandatory }}", dest: "logstash.crt" }
+    - { src: "{{ elk_logstash_cert_key_file | mandatory }}", dest: "logstash.key" }
   notify:
     - restart elk
 
